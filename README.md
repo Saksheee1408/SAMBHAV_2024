@@ -1,70 +1,182 @@
-# Getting Started with Create React App
+ EcoCircle Platform Documentation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Overview
+EcoCircle is a comprehensive sustainable e-commerce platform that promotes environmental consciousness through various innovative features. The platform combines marketplace functionality with educational resources and sustainable living solutions.
+Core Features
 
-## Available Scripts
+ 1. Sustainable Menstrual Health Hub
+Sustainable Product Marketplace:
+- Eco-friendly menstrual cups
+- Reusable cloth pads
+- Organic cotton tampons
+- Period underwear
+- Sterilization and cleaning products
+- Product comparison tools
+- Environmental impact calculator for each product
 
-In the project directory, you can run:
+ Educational Resources:
+- Menstrual health awareness articles
+- Product usage guides and tutorials
+- Hygiene best practices
+- Environmental impact of traditional vs. sustainable products
+- Myth-busting content
+- Expert interviews and advice
+- Community experiences and testimonials
 
-### `npm start`
+ Recycling Program:
+- Collection points for disposable products
+- Proper disposal guidelines
+- Waste reduction tracking
+- Partnership with recycling facilities
+- Impact measurement dashboard
+- Community recycling challenges
+- Rewards for participation
+Subscription Services:
+- Customizable monthly boxes
+- Flexible delivery schedules
+- Product mix optimization
+- Cost savings calculations
+- Carbon footprint reduction tracking
+- Easy modification and cancellation
+- Special member benefits and discounts
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+2. Reuse and Recycle Hub:
+- Item exchange marketplace
+- Recycling guides and tips
+- Local recycling center locator
+- Waste reduction tracking
+- Community recycling challenges
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+3. Best from Waste Marketplace:
+- Upcycled product listings
+- DIY transformation guides
+- Artisan and creator profiles
+- Product impact metrics
+- Before/after showcases
 
-### `npm test`
+4. Interactive Dashboard:
+- Personal environmental impact metrics
+- Sustainability score
+- User activity tracking
+- Carbon footprint calculator
+- Achievement badges
+- Impact visualization
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+ Technical Stack:
+- Frontend: React.js
+- Backend: Firebase
+- Authentication: Firebase Auth
+- Database: Firebase Firestore
+- Hosting: Vercel
+- UI Components: Lucid React
 
-### `npm run build`
+## Installation Guide
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm (v6 or higher)
+- Git
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Setup Instructions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository
+```bash
+git clone https://github.com/Saksheee1408/SAMBHAV_2024
+cd SAMBHAV_2024
+```
 
-### `npm run eject`
+2. Install dependencies
+```bash
+npm install
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Firebase Setup
+- Create a new Firebase project
+- Enable Authentication and Firestore
+- Add Firebase configuration to your project
+```javascript
+// src/firebase/config.js
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-auth-domain",
+  projectId: "your-project-id",
+  storageBucket: "your-storage-bucket",
+  messagingSenderId: "your-messaging-sender-id",
+  appId: "your-app-id"
+};
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Install Lucid React Components
+```bash
+npm install lucide-react
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+5. Start the development server
+```bash
+npm start
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Deployment
+Current deployment: https://sambhav-2024-sbcx.vercel.app/
 
-## Learn More
+### Deployment Steps
+1. Build the project
+```bash
+npm run build
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. Deploy to Vercel
+- Connect your GitHub repository to Vercel
+- Configure build settings
+- Deploy
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Feature Implementation Guidelines
 
-### Code Splitting
+### Menstrual Health Section Implementation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### Product Marketplace Features
+- Product catalog with detailed specifications
+- Comparison tool implementation
+- Review and rating system
+- Environmental impact calculator
+- Inventory management system
+- Search and filter functionality
 
-### Analyzing the Bundle Size
+#### Educational Content Management
+- Content management system for articles
+- Video tutorial hosting
+- Interactive learning modules
+- Expert profile management
+- Community forum integration
+- Resource library organization
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+#### Recycling Program Features
+- Collection point mapping
+- Waste tracking system
+- Reward point system
+- Partner facility integration
+- Impact visualization
+- Community engagement tools
 
-### Making a Progressive Web App
+ Subscription System
+- Subscription plan management
+- Delivery schedule system
+- Product customization interface
+- Payment integration
+- Account management features
+- Analytics dashboard
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+ Future Enhancements
+- AI-powered product recommendations
+- Virtual consultation integration
+- Advanced analytics dashboard
+- Mobile app development
+- International marketplace expansion
+- Enhanced impact tracking metrics
+- Gamification of sustainable practices
+- Community feature expansion
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+ Known Issues
+- Reuse & Recycle page integration pending
+- Dashboard optimization needed
+- Improvement in Backend
