@@ -116,7 +116,7 @@ npm start
 ```
 
 ## Deployment
-Current deployment: https://sambhav-2024-sbcx.vercel.app/
+Current deployment: https://sambhav-2024-sbcx.vercel.app/(Firebase
 
 ### Deployment Steps
 1. Build the project
