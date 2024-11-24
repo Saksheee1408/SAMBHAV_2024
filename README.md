@@ -8,8 +8,7 @@ Core Features
 Sustainable Product Marketplace:
 - Eco-friendly menstrual cups
 - Reusable cloth pads
-- Organic cotton tampons
-- Period underwear
+- Organic cotton tamponsS
 - Sterilization and cleaning products
 - Product comparison tools
 - Environmental impact calculator for each product
