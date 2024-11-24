@@ -5,6 +5,8 @@ import SustainabilityPlatform from "./pages/HomePage";
 import MarketplacePage from "./pages/MarketplacePage";
 import MenstrualHealthPage from "./pages/MenstrualHealthPage";
 import ReuseRecyclePage from "./pages/ReuseRecyclePage";
+import DashboardPage from "./pages/DashboardPage"
+import HomePage from './pages/HomePage';
 
 const App = () => {
   return (
@@ -13,13 +15,13 @@ const App = () => {
         <header className="flex justify-between items-center p-6 bg-white shadow-sm">
           <div className="flex items-center space-x-4">
             <GlobeIcon size={40} className="text-green-600" />
-            <Link to="/" className="text-3xl font-bold text-green-800 hover:text-green-700">
+            <Link to="/dashboard" className="text-3xl font-bold text-green-800 hover:text-green-700">
               EcoCircle Platform
             </Link>
           </div>
           <nav className="flex space-x-4">
             <Link 
-              to="/" 
+              to="/dashboard" 
               className="text-green-700 hover:bg-green-100 px-4 py-2 rounded transition-colors"
             >
               Dashboard
@@ -47,7 +49,8 @@ const App = () => {
 
         <main className="container mx-auto px-4">
           <Routes>
-            <Route exact path="/" element={<SustainabilityPlatform />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/reuse-recycle" element={<ReuseRecyclePage />} />
             <Route path="/menstrual-health" element={<MenstrualHealthPage />} />
