@@ -4,6 +4,7 @@ import { GlobeIcon } from 'lucide-react';
 import SustainabilityPlatform from "./pages/HomePage";
 import MarketplacePage from "./pages/MarketplacePage";
 import MenstrualHealthPage from "./pages/MenstrualHealthPage";
+import ReuseRecyclePage from "./pages/ReuseRecyclePage";
 
 const App = () => {
   return (
@@ -30,6 +31,12 @@ const App = () => {
               Marketplace
             </Link>
             <Link 
+              to="/reuse-recycle" 
+              className="text-green-700 hover:bg-green-100 px-4 py-2 rounded transition-colors"
+            >
+              Reuse & Recycle
+            </Link>
+            <Link 
               to="/menstrual-health" 
               className="text-green-700 hover:bg-green-100 px-4 py-2 rounded transition-colors"
             >
@@ -42,6 +49,7 @@ const App = () => {
           <Routes>
             <Route exact path="/" element={<SustainabilityPlatform />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/reuse-recycle" element={<ReuseRecyclePage />} />
             <Route path="/menstrual-health" element={<MenstrualHealthPage />} />
           </Routes>
         </main>

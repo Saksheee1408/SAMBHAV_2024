@@ -1,49 +1,154 @@
-import React, { useState } from 'react';
-import { Trophy, CheckCircle, Upload } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { 
+  Trophy, CheckCircle, XCircle, ShoppingBag, 
+  Leaf, Heart, Star, ArrowRight, Search,
+  Upload, AlertTriangle, Camera
+} from 'lucide-react';
 
 const MarketplacePage = () => {
+  // State Management
   const [currentView, setCurrentView] = useState('landing');
   const [submissionType, setSubmissionType] = useState(null);
   const [verifiedProducts, setVerifiedProducts] = useState([]);
+  const [assessmentResult, setAssessmentResult] = useState(null);
+  const [feedback, setFeedback] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+  const [alert, setAlert] = useState(null);
+  const [showAssessmentModal, setShowAssessmentModal] = useState(false);
 
-  // Landing Section
-  const LandingSection = () => (
-    <div className="text-center py-16 bg-green-50">
-      <h1 className="text-4xl font-bold text-green-800 mb-4">
-        Make a Difference with Your Creativity! Transform Waste into Wonders
-      </h1>
-      <p className="text-xl text-green-600 mb-8">
-        Compete to showcase your best from waste creations and contribute to a sustainable future
-      </p>
-      <div className="flex justify-center space-x-6">
-        <button 
-          onClick={() => {
-            setCurrentView('submission');
-            setSubmissionType('sale');
-          }}
-          className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition"
-        >
-          Submit for Sale
-        </button>
-        <button 
-          onClick={() => {
-            setCurrentView('submission');
-            setSubmissionType('compete');
-          }}
-          className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition"
-        >
-          Enter Challenge
-        </button>
-      </div>
-      <p className="mt-8 text-gray-600">
-        Join the movement towards a cleaner, greener future! Every contribution counts.
-      </p>
+  // Alert System
+  const showAlert = (message, type = 'success') => {
+    setAlert({ message, type });
+    setTimeout(() => setAlert(null), 3000);
+  };
+
+  // Cart Functions
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+    showAlert('Product added to cart!');
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(cart.filter(item => item.id !== productId));
+    showAlert('Product removed from cart');
+  };
+
+  // Wishlist Functions
+  const toggleWishlist = (product) => {
+    if (wishlist.find(item => item.id === product.id)) {
+      setWishlist(wishlist.filter(item => item.id !== product.id));
+      showAlert('Removed from wishlist');
+    } else {
+      setWishlist([...wishlist, product]);
+      showAlert('Added to wishlist!');
+    }
+  };
+
+  // Assessment System
+  const assessProduct = (formData) => {
+    let score = 0;
+    let feedback = [];
+    
+    // Material sustainability scoring
+    const materialScores = {
+      'Wood': 8,
+      'Plastic': 3,
+      'Fabric': 7,
+      'Metal': 6,
+      'Glass': 9
+    };
+    
+    score += materialScores[formData.materials] || 0;
+
+    // Description assessment
+    if (formData.description.length < 50) {
+      feedback.push("Add more product details (min 50 characters)");
+      score -= 2;
+    }
+
+    // Price assessment
+    const price = parseFloat(formData.price);
+    if (price < 10) {
+      feedback.push("Consider a higher price for sustainable products");
+      score -= 1;
+    }
+
+    // Category-specific criteria
+    switch (formData.category) {
+      case 'Furniture':
+        if (formData.materials === 'Plastic') {
+          feedback.push("Consider using more sustainable materials for furniture");
+          score -= 2;
+        }
+        break;
+      case 'Fashion':
+        if (!formData.description.toLowerCase().includes('recycled')) {
+          feedback.push("Mention if materials are recycled");
+          score -= 1;
+        }
+        break;
+    }
+
+    // Image validation
+    if (!formData.image) {
+      feedback.push("Product images are required");
+      score -= 3;
+    }
+
+    return {
+      passed: score >= 6,
+      score: Math.max(0, Math.min(10, score)), // Clamp between 0-10
+      feedback
+    };
+  };
+
+  // Alert Component
+  const Alert = ({ message, type }) => (
+    <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 transition-opacity duration-300 
+      ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`}>
+      {message}
     </div>
   );
 
-  // Product Submission Form
+  // Modal Component
+  const Modal = ({ children, onClose }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 max-w-xl w-full mx-4 relative">
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          ×
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+
+  // Advertisement Banner
+  const AdvertBanner = () => (
+    <div className="bg-gradient-to-r from-green-500 via-green-400 to-emerald-500 text-white py-3 px-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <p className="text-sm md:text-base font-medium">
+          🌿 Special Offer: Get 10% off your first sustainable purchase with code: ECOSAVE10
+        </p>
+        <button 
+          onClick={() => setCurrentView('shop')}
+          className="text-xs md:text-sm underline hover:text-green-100"
+        >
+          Shop Now
+        </button>
+      </div>
+    </div>
+  );
+
+  // Product Form Component
   const ProductSubmissionForm = () => {
     const [formData, setFormData] = useState({
+      id: Date.now(), // Unique ID for each product
       productName: '',
       description: '',
       category: '',
@@ -51,211 +156,455 @@ const MarketplacePage = () => {
       price: '',
       image: null
     });
+    const [errors, setErrors] = useState({});
+    const [previewUrl, setPreviewUrl] = useState(null);
 
-    const categories = ['Furniture', 'Toys', 'Decor', 'Art'];
-    const materials = ['Wood', 'Plastic', 'Fabric', 'Metal', 'Glass'];
+    const categories = ['Furniture', 'Toys', 'Decor', 'Art', 'Fashion', 'Accessories'];
+    const materials = ['Wood', 'Plastic', 'Fabric', 'Metal', 'Glass', 'Recycled'];
 
-    const calculateSustainabilityScore = (material) => {
-      const scores = {
-        'Wood': 8,
-        'Plastic': 3,
-        'Fabric': 7,
-        'Metal': 6,
-        'Glass': 9
-      };
-      return scores[material] || 5;
+    const validateForm = () => {
+      const newErrors = {};
+      if (!formData.productName) newErrors.productName = 'Product name is required';
+      if (formData.description.length < 50) newErrors.description = 'Description must be at least 50 characters';
+      if (!formData.category) newErrors.category = 'Category is required';
+      if (!formData.materials) newErrors.materials = 'Materials are required';
+      if (!formData.price || formData.price <= 0) newErrors.price = 'Valid price is required';
+      if (!formData.image) newErrors.image = 'Product image is required';
+      return newErrors;
+    };
+
+    const handleImageChange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        setFormData({ ...formData, image: file });
+        setPreviewUrl(URL.createObjectURL(file));
+      }
     };
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      const sustainabilityScore = calculateSustainabilityScore(formData.materials);
-      const newProduct = {
-        ...formData,
-        sustainabilityScore,
-        type: submissionType
-      };
-      setVerifiedProducts([...verifiedProducts, newProduct]);
-      setCurrentView('verified-products');
+      const formErrors = validateForm();
+      
+      if (Object.keys(formErrors).length === 0) {
+        const result = assessProduct(formData);
+        setAssessmentResult(result);
+        setFeedback(result.feedback);
+        
+        if (result.passed) {
+          const newProduct = {
+            ...formData,
+            sustainabilityScore: result.score,
+            type: submissionType,
+            status: 'verified',
+            createdAt: new Date().toISOString()
+          };
+          setVerifiedProducts([...verifiedProducts, newProduct]);
+          setShowAssessmentModal(true);
+        } else {
+          setShowAssessmentModal(true);
+        }
+      } else {
+        setErrors(formErrors);
+      }
     };
 
     return (
-      <div className="max-w-xl mx-auto p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-green-800">
-          {submissionType === 'sale' ? 'Product Submission' : 'Challenge Submission'}
+      <div className="max-w-2xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
+        <h2 className="text-2xl font-bold text-green-800 mb-6">
+          Submit Your Sustainable Product
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input 
-            type="text" 
-            placeholder="Product Name" 
-            required 
-            className="w-full p-2 border rounded"
-            value={formData.productName}
-            onChange={(e) => setFormData({...formData, productName: e.target.value})}
-          />
-          <textarea 
-            placeholder="Product Description" 
-            required 
-            className="w-full p-2 border rounded"
-            value={formData.description}
-            onChange={(e) => setFormData({...formData, description: e.target.value})}
-          />
-          <select 
-            required 
-            className="w-full p-2 border rounded"
-            value={formData.category}
-            onChange={(e) => setFormData({...formData, category: e.target.value})}
-          >
-            <option value="">Select Category</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-          <select 
-            required 
-            className="w-full p-2 border rounded"
-            value={formData.materials}
-            onChange={(e) => setFormData({...formData, materials: e.target.value})}
-          >
-            <option value="">Select Materials</option>
-            {materials.map(mat => (
-              <option key={mat} value={mat}>{mat}</option>
-            ))}
-          </select>
-          <input 
-            type="number" 
-            placeholder="Price" 
-            required 
-            className="w-full p-2 border rounded"
-            value={formData.price}
-            onChange={(e) => setFormData({...formData, price: e.target.value})}
-          />
-          <input 
-            type="file" 
-            accept="image/*" 
-            required 
-            className="w-full p-2 border rounded"
-            onChange={(e) => setFormData({...formData, image: e.target.files[0]})}
-          />
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-gray-700 mb-2">Product Name</label>
+            <input 
+              type="text" 
+              className={`w-full p-3 border rounded-lg ${errors.productName ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.productName}
+              onChange={(e) => setFormData({...formData, productName: e.target.value})}
+              placeholder="Enter product name"
+            />
+            {errors.productName && (
+              <p className="text-red-500 text-sm mt-1">{errors.productName}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Description</label>
+            <textarea 
+              className={`w-full p-3 border rounded-lg min-h-[100px] ${errors.description ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              placeholder="Describe your product (min 50 characters)"
+            />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 mb-2">Category</label>
+              <select 
+                className={`w-full p-3 border rounded-lg ${errors.category ? 'border-red-500' : 'border-gray-300'}`}
+                value={formData.category}
+                onChange={(e) => setFormData({...formData, category: e.target.value})}
+              >
+                <option value="">Select Category</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+              {errors.category && (
+                <p className="text-red-500 text-sm mt-1">{errors.category}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-gray-700 mb-2">Primary Material</label>
+              <select 
+                className={`w-full p-3 border rounded-lg ${errors.materials ? 'border-red-500' : 'border-gray-300'}`}
+                value={formData.materials}
+                onChange={(e) => setFormData({...formData, materials: e.target.value})}
+              >
+                <option value="">Select Material</option>
+                {materials.map(mat => (
+                  <option key={mat} value={mat}>{mat}</option>
+                ))}
+              </select>
+              {errors.materials && (
+                <p className="text-red-500 text-sm mt-1">{errors.materials}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Price ($)</label>
+            <input 
+              type="number" 
+              className={`w-full p-3 border rounded-lg ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
+              value={formData.price}
+              onChange={(e) => setFormData({...formData, price: e.target.value})}
+              placeholder="Enter price"
+              min="0"
+              step="0.01"
+            />
+            {errors.price && (
+              <p className="text-red-500 text-sm mt-1">{errors.price}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 mb-2">Product Image</label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+              {previewUrl ? (
+                <div className="relative">
+                  <img 
+                    src={previewUrl} 
+                    alt="Preview" 
+                    className="max-h-48 mx-auto rounded"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewUrl(null);
+                      setFormData({...formData, image: null});
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full"
+                  >
+                    ×
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Camera className="mx-auto text-gray-400" size={48} />
+                  <p className="text-gray-500">Click to upload or drag and drop</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+              )}
+            </div>
+            {errors.image && (
+              <p className="text-red-500 text-sm mt-1">{errors.image}</p>
+            )}
+          </div>
+
           <button 
-            type="submit" 
-            className="w-full bg-green-600 text-white p-3 rounded hover:bg-green-700"
+            type="submit"
+            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 
+              transition-colors font-medium"
           >
-            Submit Product
+            Submit for Assessment
           </button>
         </form>
       </div>
     );
   };
 
-  // Challenges Section
-  const ChallengesSection = () => {
-    const challenges = [
-      {
-        id: 1,
-        title: "Upcycled Wooden Furniture",
-        description: "Create a unique piece of furniture from old wooden scraps",
-        icon: <Trophy size={48} className="text-green-600" />
-      },
-      {
-        id: 2,
-        title: "Plastic Waste to Art",
-        description: "Turn plastic waste into a beautiful art piece",
-        icon: <Upload size={48} className="text-blue-600" />
-      },
-      {
-        id: 3,
-        title: "Fabric Scrap Fashion",
-        description: "Design a wearable item from old fabric scraps",
-        icon: <CheckCircle size={48} className="text-purple-600" />
-      }
-    ];
 
-    return (
-      <div className="py-12 bg-gray-50">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-green-800">
-            Sustainability Challenges
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {challenges.map(challenge => (
-              <div 
-                key={challenge.id} 
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition"
-              >
-                <div className="flex items-center mb-4">
-                  {challenge.icon}
-                  <h3 className="ml-4 text-xl font-semibold">{challenge.title}</h3>
-                </div>
-                <p className="text-gray-600 mb-4">{challenge.description}</p>
-                <button 
+  
+    // Assessment Modal
+    const AssessmentModal = () => (
+      <Modal onClose={() => setShowAssessmentModal(false)}>
+        <div className={`p-6 ${assessmentResult.passed ? 'bg-green-50' : 'bg-red-50'} rounded-lg`}>
+          <div className="flex items-center gap-3 mb-4">
+            {assessmentResult.passed ? (
+              <CheckCircle className="text-green-600" size={32} />
+            ) : (
+              <AlertTriangle className="text-red-600" size={32} />
+            )}
+            <h3 className="text-2xl font-bold">
+              {assessmentResult.passed ? 'Product Approved!' : 'Assessment Failed'}
+            </h3>
+          </div>
+  
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-lg font-medium">Sustainability Score:</span>
+              <span className={`text-xl font-bold ${
+                assessmentResult.passed ? 'text-green-600' : 'text-red-600'
+              }`}>
+                {assessmentResult.score}/10
+              </span>
+            </div>
+  
+            {feedback.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-semibold mb-2">Feedback:</h4>
+                <ul className="list-disc pl-5 space-y-1">
+                  {feedback.map((item, index) => (
+                    <li key={index} className="text-gray-700">{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+  
+          <div className="flex gap-4">
+            {assessmentResult.passed ? (
+              <>
+                <button
                   onClick={() => {
-                    setCurrentView('submission');
-                    setSubmissionType('compete');
+                    setShowAssessmentModal(false);
+                    setCurrentView('shop');
                   }}
-                  className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600"
+                  className="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg 
+                    hover:bg-green-700 transition-colors font-medium"
                 >
-                  Participate
+                  View in Marketplace
+                </button>
+                <button
+                  onClick={() => setShowAssessmentModal(false)}
+                  className="flex-1 border border-green-600 text-green-600 py-3 px-6 
+                    rounded-lg hover:bg-green-50 transition-colors font-medium"
+                >
+                  Submit Another
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setShowAssessmentModal(false)}
+                className="flex-1 bg-gray-600 text-white py-3 px-6 rounded-lg 
+                  hover:bg-gray-700 transition-colors font-medium"
+              >
+                Revise Submission
+              </button>
+            )}
+          </div>
+        </div>
+      </Modal>
+    );
+  
+    // Product Card Component
+    const ProductCard = ({ product }) => {
+      const isInWishlist = wishlist.find(item => item.id === product.id);
+      
+      return (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="relative">
+            <img 
+              src={URL.createObjectURL(product.image)} 
+              alt={product.productName}
+              className="w-full h-48 object-cover"
+            />
+            <button
+              onClick={() => toggleWishlist(product)}
+              className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md
+                hover:bg-gray-100 transition-colors"
+            >
+              <Heart 
+                className={isInWishlist ? 'text-red-500' : 'text-gray-400'} 
+                size={20} 
+                fill={isInWishlist ? 'currentColor' : 'none'}
+              />
+            </button>
+          </div>
+  
+          <div className="p-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              {product.productName}
+            </h3>
+            
+            <div className="flex items-center gap-2 mb-3">
+              <Leaf className="text-green-500" size={16} />
+              <span className="text-sm text-gray-600">
+                Sustainability Score: {product.sustainabilityScore}/10
+              </span>
+            </div>
+  
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {product.description}
+            </p>
+  
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-bold text-gray-900">
+                ${parseFloat(product.price).toFixed(2)}
+              </span>
+              <button
+                onClick={() => addToCart(product)}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700
+                  transition-colors text-sm font-medium flex items-center gap-2"
+              >
+                <ShoppingBag size={16} />
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+  
+    // Shop View Component
+    const ShopView = () => {
+      const filteredProducts = verifiedProducts.filter(product => {
+        const matchesSearch = product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      });
+  
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search sustainable products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2
+                    focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+              
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="p-2 border border-gray-300 rounded-lg focus:ring-2
+                  focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="all">All Categories</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Toys">Toys</option>
+                <option value="Decor">Decor</option>
+                <option value="Art">Art</option>
+                <option value="Fashion">Fashion</option>
+                <option value="Accessories">Accessories</option>
+              </select>
+            </div>
+          </div>
+  
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+  
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
+            </div>
+          )}
+        </div>
+      );
+    };
+  
+    // Main Render
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <AdvertBanner />
+        
+        {/* Navigation */}
+        <nav className="bg-white shadow-sm">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-green-800 flex items-center gap-2">
+                <Leaf />
+                EcoMarket
+              </h1>
+              
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setCurrentView('shop')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentView === 'shop' ? 'bg-green-100 text-green-800' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Shop
+                </button>
+                <button
+                  onClick={() => setCurrentView('submit')}
+                  className={`px-4 py-2 rounded-lg transition-colors ${
+                    currentView === 'submit' ? 'bg-green-100 text-green-800' : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Sell
+                </button>
+                <button
+                  onClick={() => setCurrentView('wishlist')}
+                  className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Heart size={24} />
+                  {wishlist.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs
+                      w-5 h-5 rounded-full flex items-center justify-center">
+                      {wishlist.length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setCurrentView('cart')}
+                  className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <ShoppingBag size={24} />
+                  {cart.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs
+                      w-5 h-5 rounded-full flex items-center justify-center">
+                      {cart.length}
+                    </span>
+                  )}
                 </button>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
+        </nav>
+  
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-8">
+          {currentView === 'landing' && <ShopView />}
+          {currentView === 'shop' && <ShopView />}
+          {currentView === 'submit' && <ProductSubmissionForm />}
+          {showAssessmentModal && <AssessmentModal />}
+          {alert && <Alert message={alert.message} type={alert.type} />}
+        </main>
       </div>
     );
   };
-
-  // Verified Products Section
-  const VerifiedProductsSection = () => {
-    return (
-      <div className="py-12 bg-white">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8 text-green-800">
-            Verified Products
-          </h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            {verifiedProducts.map((product, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-50 p-4 rounded-lg shadow-md relative"
-              >
-                <div className="absolute top-2 right-2">
-                  <CheckCircle size={24} className="text-green-600" />
-                </div>
-                <img 
-                  src={URL.createObjectURL(product.image)} 
-                  alt={product.productName} 
-                  className="w-full h-48 object-cover rounded mb-4"
-                />
-                <h3 className="text-xl font-semibold">{product.productName}</h3>
-                <p className="text-gray-600">{product.category}</p>
-                <div className="flex justify-between items-center mt-4">
-                  <span className="font-bold text-green-700">
-                    ${product.price}
-                  </span>
-                  <span className="bg-green-200 text-green-800 px-2 py-1 rounded">
-                    Score: {product.sustainabilityScore}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      {currentView === 'landing' && <LandingSection />}
-      {currentView === 'submission' && <ProductSubmissionForm />}
-      {currentView === 'verified-products' && (
-        <>
-          <ChallengesSection />
-          <VerifiedProductsSection />
-        </>
-      )}
-    </div>
-  );
-};
-
-export default MarketplacePage;
+  
+  export default MarketplacePage;
