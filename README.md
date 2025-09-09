@@ -1,5 +1,5 @@
  EcoCircle Platform Documentation
-
+#Dashboard function is hardcoded.It is not based on the real time data
 Overview
 EcoCircle is a comprehensive sustainable e-commerce platform that promotes environmental consciousness through various innovative features. The platform combines marketplace functionality with educational resources and sustainable living solutions.
 Core Features
